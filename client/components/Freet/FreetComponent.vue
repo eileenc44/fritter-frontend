@@ -7,7 +7,9 @@
   >
     <header>
       <h3 class="author">
-        @{{ freet.author }}
+        <router-link :to="'/users/' + freet.author">
+          @{{ freet.author }}
+        </router-link>
       </h3>
       <div
         v-if="$store.state.username === freet.author"

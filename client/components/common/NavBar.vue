@@ -26,6 +26,9 @@
       >
         Login
       </router-link>
+      <router-link v-if="$store.state.username" :to="'/users/' + $store.state.username">
+        Profile
+      </router-link>
     </div>
     <section class="alerts">
       <article

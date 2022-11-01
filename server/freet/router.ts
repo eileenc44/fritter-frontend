@@ -10,6 +10,47 @@ const router = express.Router();
 /**
  * Get all the freets
  *
+ * @name GET /api/freets/public
+ *
+ * @return {FreetResponse[]} - A list of all the freets sorted in descending
+ *                      order by date modified
+ */
+/**
+ * Get freets by author.
+ *
+ * @name GET /api/freets/public?author=username
+ *
+ * @return {FreetResponse[]} - An array of freets created by user with username, author
+ * @throws {400} - If author is not given
+ * @throws {404} - If no user has given author
+ *
+ */
+ router.get(
+  '/public',
+  async (req: Request, res: Response, next: NextFunction) => {
+    // Check if author query parameter was supplied
+    if (req.query.author !== undefined) {
+      next();
+      return;
+    }
+
+    const allFreets = await FreetCollection.findAllNotGroupFreets();
+    const response = allFreets.map(util.constructFreetResponse);
+    res.status(200).json(response);
+  },
+  [
+    userValidator.isAuthorExists
+  ],
+  async (req: Request, res: Response) => {
+    const authorFreets = await FreetCollection.findAllNotGroupFreetsByUsername(req.query.author as string);
+    const response = authorFreets.map(util.constructFreetResponse);
+    res.status(200).json(response);
+  }
+);
+
+/**
+ * Get all the freets
+ *
  * @name GET /api/freets
  *
  * @return {FreetResponse[]} - A list of all the freets sorted in descending
@@ -67,7 +108,7 @@ router.post(
   ],
   async (req: Request, res: Response) => {
     const userId = (req.session.userId as string) ?? ''; // Will not be an empty string since its validated in isUserLoggedIn
-    const freet = await FreetCollection.addOne(userId, req.body.content);
+    const freet = await FreetCollection.addOne(userId, req.body.content, req.body.anonymous ? true : false);
 
     res.status(201).json({
       message: 'Your freet was created successfully.',
