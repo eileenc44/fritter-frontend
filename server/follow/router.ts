@@ -77,7 +77,7 @@ router.post(
 /**
  * Unfollow a user
  *
- * @name DELETE /api/follow?followee=USERNAME
+ * @name DELETE /api/follow/:followeeName?
  *
  * @param {string} followee - The name of the user to unfollow
  * @return {string} - A success message

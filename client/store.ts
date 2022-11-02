@@ -11,7 +11,8 @@ const store = new Vuex.Store({
   state: {
     filter: null, // Username to filter shown freets by (null = show all)
     freets: [], // All freets created in the app
-    followers: [], // All of the logged in user's followers
+    followers: [], // All of the user's followers
+    followees: [], // All of the user's followees
     username: null, // Username of the logged in user
     alerts: {} // global success/error messages encountered during submissions to non-visible forms
   },
@@ -56,6 +57,9 @@ const store = new Vuex.Store({
     },
     updateFollowers(state, followers) {
       state.followers = followers;
+    },
+    updateFollowees(state, followees) {
+      state.followees = followees;
     }
   },
   // Store data across page refreshes, only discard on browser close

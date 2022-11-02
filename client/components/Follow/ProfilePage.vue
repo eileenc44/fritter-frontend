@@ -11,7 +11,7 @@
         <h2>{{$route.params.id}}'s Followers</h2>
       </header>
       <FollowComponent
-        v-for="follower in followers"
+        v-for="follower in $store.state.followers"
         :key="follower.id"
         :follow="follower.follower"
       />
@@ -19,28 +19,33 @@
         <h2>Your Followees</h2>
       </header>
       <header v-else>
-        <h2>{{$route.params.id}}'s Followers</h2>
+        <h2>{{$route.params.id}}'s Followees</h2>
       </header>
       <FollowComponent
-        v-for="followee in followees"
+        v-for="followee in $store.state.followees"
         :key="followee.id"
         :follow="followee.followee"
       />
     </section>
     <section>
       <header v-if="$store.state.username != $route.params.id">
-        <button
-          v-if="!isFollowing"
-          type="submit"
-        >
-          Follow {{ $route.params.id }}
-        </button>
-        <button
-          v-else
-          type="submit"
-        >
-          Unfollow {{ $route.params.id }}
-        </button>
+        <FollowUnfollowButton v-if="!isFollowing"
+          :title="'Follow'"
+          :url="'/api/follow'"
+          :method="'POST'"
+          :hasBody="true"
+          :fields="{'followeeName': $route.params.id}"
+          :alerts={}
+          :callback="getFollowers"
+        />
+        <FollowUnfollowButton v-else
+          :title="'Unfollow'"
+          :url="'/api/follow/' + $route.params.id"
+          :method="'DELETE'"
+          :hasBody="false"
+          :alerts={}
+          :callback="getFollowers"
+        />
       </header>
     </section>
   </main>
@@ -48,14 +53,13 @@
 
 <script>
 import FollowComponent from '@/components/Follow/FollowComponent.vue';
+import FollowUnfollowButton from '@/components/Follow/FollowUnfollowButton.vue';
 
 export default {
   name: 'ProfilePage',
-  components: {FollowComponent},
+  components: {FollowComponent, FollowUnfollowButton},
   data() {
     return {
-      followers: [],
-      followees: [],
       isFollowing: false
     };
   },
@@ -69,8 +73,8 @@ export default {
           throw new Error(res.error);
         }
 
-        this.followers = res;
         this.$store.commit('updateFollowers', res);
+        this.findIfFollowing();
       } catch (e) {
         this.$set(this.alerts, e, 'error');
         setTimeout(() => this.$delete(this.alerts, e), 3000);
@@ -85,21 +89,29 @@ export default {
           throw new Error(res.error);
         }
 
-        this.followees = res;
-        this.findIfFollowing();
+        this.$store.commit('updateFollowees', res);
       } catch (e) {
         this.$set(this.alerts, e, 'error');
         setTimeout(() => this.$delete(this.alerts, e), 3000);
       }
     },
     findIfFollowing() {
-      const result = this.followees.find(({ followee }) => followee === this.$store.state.username);
+      const result = this.$store.state.followers.find(({ follower }) => follower === this.$store.state.username);
       this.isFollowing = result ? true : false;
     }
   },
   mounted() {
     this.getFollowers();
     this.getFollowees();
+  },
+  created() {
+    this.$watch(
+      () => this.$route.params,
+      (toParams, previousParams) => {
+        this.getFollowers();
+        this.getFollowees();
+      }
+    )
   }
 };
 </script>
