@@ -2,7 +2,9 @@
 
 <template>
   <header>
-    {{follow}}
+    <router-link :to="'/users/' + follow">
+      @{{follow}}
+    </router-link>
   </header>
 </template>
 

@@ -2,7 +2,7 @@
 <!-- User should be authenticated in order to see this page -->
 
 <template>
-  <main>
+  <main v-if="!userNotFound">
     <section>
       <header v-if="$store.state.username == $route.params.id">
         <h2>Your Followers</h2>
@@ -49,18 +49,23 @@
       </header>
     </section>
   </main>
+  <NotFound v-else />
 </template>
 
 <script>
 import FollowComponent from '@/components/Follow/FollowComponent.vue';
 import FollowUnfollowButton from '@/components/Follow/FollowUnfollowButton.vue';
+import NotFound from '@/NotFound.vue';
 
 export default {
   name: 'ProfilePage',
-  components: {FollowComponent, FollowUnfollowButton},
+  components: {FollowComponent, FollowUnfollowButton, NotFound},
   data() {
     return {
-      isFollowing: false
+      isFollowing: false,
+      userNotFound: false,
+      value: '',
+      alerts: {}
     };
   },
   methods: {
@@ -69,10 +74,13 @@ export default {
       try {
         const r = await fetch(url);
         const res = await r.json();
+        if (r.status == 404) {
+          this.userNotFound = true;
+        }
         if (!r.ok) {
           throw new Error(res.error);
         }
-
+        this.userNotFound = false;
         this.$store.commit('updateFollowers', res);
         this.findIfFollowing();
       } catch (e) {

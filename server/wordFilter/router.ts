@@ -43,7 +43,7 @@ router.post(
   '/',
   [
     userValidator.isUserLoggedIn,
-    // wordFilterValidator.isValidWord
+    wordFilterValidator.isValidWord
   ],
   async (req: Request, res: Response) => {
     const wordFilter = await WordFilterCollection.addOne(req.session.userId as string, req.body.word);
