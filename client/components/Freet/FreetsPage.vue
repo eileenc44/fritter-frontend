@@ -32,6 +32,12 @@
           </h2>
         </div>
         <div class="right">
+          <button v-if="!filterMenuOn" @click="menuToggle">
+            Filter
+          </button>
+          <WordFilterMenu v-else @closeMenu="menuToggle"
+            :getWordsToFilter="getWordsToFilter"
+          />
           <GetFreetsForm
             ref="getFreetsForm"
             value="author"
@@ -62,12 +68,44 @@
 import FreetComponent from '@/components/Freet/FreetComponent.vue';
 import CreateFreetForm from '@/components/Freet/CreateFreetForm.vue';
 import GetFreetsForm from '@/components/Freet/GetFreetsForm.vue';
+import WordFilterMenu from '@/components/WordFilter/WordFilterMenu.vue';
 
 export default {
   name: 'FreetPage',
-  components: {FreetComponent, GetFreetsForm, CreateFreetForm},
+  components: {FreetComponent, GetFreetsForm, CreateFreetForm, WordFilterMenu},
+  data() {
+    return {
+      filterMenuOn: false
+    }
+  },
+  methods: {
+    menuToggle(event) {
+      this.filterMenuOn = !this.filterMenuOn;
+    },
+    async getWordsToFilter() {
+      const url = '/api/wordFilter';
+      const options = {
+        method: 'GET',
+        headers: {'Content-Type': 'application/json'},
+        credentials: 'same-origin' // Sends express-session credentials with request
+      };
+
+      try {
+        const r = await fetch(url, options);
+        const res = await r.json();
+        if (!r.ok) {
+          throw new Error(res.error);
+        }
+        this.$store.commit('updateWordFilter', res.map(word => word.word));
+      } catch (e) {
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
+    }
+  },
   mounted() {
     this.$refs.getFreetsForm.submit();
+    this.getWordsToFilter();
   }
 };
 </script>

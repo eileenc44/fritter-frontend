@@ -37,6 +37,14 @@
           🗑️ Delete
         </button>
       </div>
+      <div v-if="containsFilterWord(freet.content)">
+        <button v-if="isBlur" @click="isBlur=false">
+          Unblur
+        </button>
+        <button v-else="isBlur" @click="isBlur=true">
+          Blur
+        </button>
+      </div>
     </header>
     <textarea
       v-if="editing"
@@ -46,7 +54,7 @@
     />
     <p
       v-else
-      class="content"
+      :class="{blur: isBlur}"
     >
       {{ freet.content }}
     </p>
@@ -74,13 +82,14 @@ export default {
     freet: {
       type: Object,
       required: true
-    }
+    },
   },
   data() {
     return {
       editing: false, // Whether or not this freet is in edit mode
       draft: this.freet.content, // Potentially-new content for this freet
-      alerts: {} // Displays success/error messages encountered during freet modification
+      alerts: {}, // Displays success/error messages encountered during freet modification
+      isBlur: this.containsFilterWord(this.freet.content)
     };
   },
   methods: {
@@ -163,6 +172,17 @@ export default {
         this.$set(this.alerts, e, 'error');
         setTimeout(() => this.$delete(this.alerts, e), 3000);
       }
+    },
+    containsFilterWord(freetContent) {
+      console.log(this.$store.state.wordFilter);
+      let contains = false;
+      for (let i = 0; i < this.$store.state.wordFilter.length; i++ ) {
+        console.log(this.$store.state.wordFilter[i]);
+        if (freetContent.includes(this.$store.state.wordFilter[i])) {
+          contains = true;
+        }
+      }
+      return contains;
     }
   }
 };
@@ -173,5 +193,9 @@ export default {
     border: 1px solid #111;
     padding: 20px;
     position: relative;
+}
+
+.blur {
+    filter: blur(5px);
 }
 </style>

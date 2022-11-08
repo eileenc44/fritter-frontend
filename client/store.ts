@@ -13,6 +13,7 @@ const store = new Vuex.Store({
     freets: [], // All freets created in the app
     followers: [], // All of the user's followers
     followees: [], // All of the user's followees
+    wordFilter: [], // All words to filter
     username: null, // Username of the logged in user
     alerts: {} // global success/error messages encountered during submissions to non-visible forms
   },
@@ -60,7 +61,10 @@ const store = new Vuex.Store({
     },
     updateFollowees(state, followees) {
       state.followees = followees;
-    }
+    },
+    updateWordFilter(state, wordFilter) {
+      state.wordFilter = wordFilter;
+    },
   },
   // Store data across page refreshes, only discard on browser close
   plugins: [createPersistedState()]
