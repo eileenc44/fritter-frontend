@@ -19,6 +19,14 @@ const store = new Vuex.Store({
     username: null, // Username of the logged in user
     alerts: {} // global success/error messages encountered during submissions to non-visible forms
   },
+  getters: {
+    publicFreets(state) {
+      return state.freets.filter(freet => !freet.isGroupFreet);
+    },
+    followeeFreets(state) {
+      return state.freets.filter(freet => !freet.isGroupFreet && state.followees.map(followee => followee.followee).includes(freet.author));
+    }
+  },
   mutations: {
     alert(state, payload) {
       /**

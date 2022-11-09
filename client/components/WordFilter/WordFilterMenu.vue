@@ -43,7 +43,8 @@ export default {
 .popup {
   position: absolute;
   z-index: 99;
-  transform: translate(0%, -25%);
+  top: 50%;
+  left: 50%;
   width: 300px;
   text-align: center;
   border-color: black;

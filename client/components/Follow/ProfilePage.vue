@@ -10,22 +10,33 @@
       <header v-else>
         <h2>{{$route.params.id}}'s Followers</h2>
       </header>
-      <FollowComponent
+      <div v-if="$store.state.followers.length">
+        <FollowComponent
         v-for="follower in $store.state.followers"
         :key="follower.id"
         :follow="follower.follower"
       />
+      </div>
+      <h3 v-else>
+        No followers
+      </h3>
+      
       <header v-if="$store.state.username == $route.params.id">
         <h2>Your Followees</h2>
       </header>
       <header v-else>
         <h2>{{$route.params.id}}'s Followees</h2>
       </header>
-      <FollowComponent
-        v-for="followee in $store.state.followees"
-        :key="followee.id"
-        :follow="followee.followee"
-      />
+      <div v-if="$store.state.followees.length">
+        <FollowComponent
+          v-for="followee in $store.state.followees"
+          :key="followee.id"
+          :follow="followee.followee"
+        />
+      </div>
+      <h3 v-else>
+        No followees
+      </h3>
     </section>
     <section>
       <header v-if="$store.state.username != $route.params.id">

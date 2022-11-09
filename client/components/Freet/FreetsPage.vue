@@ -32,12 +32,20 @@
           </h2>
         </div>
         <div class="right">
-          <button v-if="!filterMenuOn" @click="menuToggle">
-            Filter
+          <div v-if="$store.state.username">
+            <button v-if="!filterMenuOn" @click="menuToggle">
+              Filter
+            </button>
+            <WordFilterMenu v-else @closeMenu="menuToggle"
+              :getWordsToFilter="getWordsToFilter"
+            />
+          </div>
+          <button v-if="followeeFeed" @click="feedToggle">
+            Public Feed
           </button>
-          <WordFilterMenu v-else @closeMenu="menuToggle"
-            :getWordsToFilter="getWordsToFilter"
-          />
+          <button v-else @click="feedToggle">
+            Followee Feed
+          </button>
           <GetFreetsForm
             ref="getFreetsForm"
             value="author"
@@ -47,10 +55,19 @@
         </div>
       </header>
       <section
-        v-if="$store.state.freets.length"
+        v-if="followeeFeed && $store.getters.followeeFreets.length"
       >
         <FreetComponent
-          v-for="freet in $store.state.freets"
+          v-for="freet in $store.getters.followeeFreets"
+          :key="freet.id"
+          :freet="freet"
+        />
+      </section>
+      <section
+        v-else-if="!followeeFeed && $store.getters.publicFreets.length"
+      >
+        <FreetComponent
+          v-for="freet in $store.getters.publicFreets"
           :key="freet.id"
           :freet="freet"
         />
@@ -76,12 +93,16 @@ export default {
   data() {
     return {
       filterMenuOn: false,
+      followeeFeed: true,
       alerts: {}
     }
   },
   methods: {
     menuToggle(event) {
       this.filterMenuOn = !this.filterMenuOn;
+    },
+    feedToggle(event) {
+      this.followeeFeed = !this.followeeFeed;
     },
     async getWordsToFilter() {
       const url = '/api/wordFilter';

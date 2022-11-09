@@ -13,13 +13,17 @@ export default {
     async submit() {
       const url = this.value ? `/api/freets?author=${this.value}` : '/api/freets';
       try {
+        await this.getFollowees();
         const r = await fetch(url);
-        const res = await r.json();
+        let res = await r.json();
         if (!r.ok) {
           throw new Error(res.error);
         }
 
         this.$store.commit('updateFilter', this.value);
+        if (this.value) {
+          res = res.filter((freet => !freet.anonymous));
+        }
         this.$store.commit('updateFreets', res);
       } catch (e) {
         if (this.value === this.$store.state.filter) {
@@ -33,6 +37,21 @@ export default {
           this.value = this.$store.state.filter;
         }
 
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
+    },
+    async getFollowees() {
+      const url = `/api/follow?follower=${this.$store.state.username}`;
+      try {
+        const r = await fetch(url);
+        const res = await r.json();
+        if (!r.ok) {
+          throw new Error(res.error);
+        }
+
+        this.$store.commit('updateFollowees', res);
+      } catch (e) {
         this.$set(this.alerts, e, 'error');
         setTimeout(() => this.$delete(this.alerts, e), 3000);
       }
