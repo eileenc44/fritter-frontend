@@ -198,7 +198,6 @@ export default {
           contains = true;
         }
       }
-      this.isBlur = contains;
       return contains;
     }
   }
