@@ -39,13 +39,14 @@
             <WordFilterMenu v-else @closeMenu="menuToggle"
               :getWordsToFilter="getWordsToFilter"
             />
+            <button v-if="followeeFeed" @click="feedToggle">
+              Public Feed
+            </button>
+            <button v-else @click="feedToggle">
+              Followee Feed
+            </button>
           </div>
-          <button v-if="followeeFeed" @click="feedToggle">
-            Public Feed
-          </button>
-          <button v-else @click="feedToggle">
-            Followee Feed
-          </button>
+
           <GetFreetsForm
             ref="getFreetsForm"
             value="author"
@@ -93,7 +94,7 @@ export default {
   data() {
     return {
       filterMenuOn: false,
-      followeeFeed: true,
+      followeeFeed: false,
       alerts: {}
     }
   },

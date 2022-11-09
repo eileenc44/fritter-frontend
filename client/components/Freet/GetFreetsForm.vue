@@ -13,7 +13,8 @@ export default {
     async submit() {
       const url = this.value ? `/api/freets?author=${this.value}` : '/api/freets';
       try {
-        await this.getFollowees();
+        if (this.$store.state.username)
+          await this.getFollowees();
         const r = await fetch(url);
         let res = await r.json();
         if (!r.ok) {
