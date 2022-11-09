@@ -271,14 +271,14 @@ router.patch(
 /**
  * Delete a freet from a group
  *
- * @name PUT /api/groups/:id/deleteFreet/:freetId?
+ * @name PATCH /api/groups/:id/deleteFreet/:freetId?
  *
  * @return {GroupResponse} - the updated group
  * @throws {403} - if the user is not logged in
  * @throws {404} - If the groupId is not valid
  * @throws {403} - If the user is not the author of the freet or is not a member of the group
  */
-router.put(
+router.patch(
   '/:groupId?/deleteFreet/:freetId',
   [
     userValidator.isUserLoggedIn,

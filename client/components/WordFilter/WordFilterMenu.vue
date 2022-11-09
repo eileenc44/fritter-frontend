@@ -44,8 +44,7 @@ export default {
   position: absolute;
   z-index: 99;
   transform: translate(0%, -25%);
-  width: 250px;
-  height: 500px;
+  width: 300px;
   text-align: center;
   border-color: black;
   border-style: solid;
@@ -62,6 +61,7 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100%;
+  padding: 2px;
 }
 
 </style>

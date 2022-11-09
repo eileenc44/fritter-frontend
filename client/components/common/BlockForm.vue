@@ -30,6 +30,22 @@
     <article v-else>
       <p>{{ content }}</p>
     </article>
+    <article
+      v-if="booleanFields.length"
+    >
+      <div
+        v-for="booleanField in booleanFields"
+        :key="booleanField.id"
+      >
+        <label :for="booleanField.id">{{ booleanField.label }}:</label>
+        <input
+          :type="'checkbox'"
+          :name="booleanField.id"
+          :checked="booleanField.value"
+          @input="booleanField.value = $event.target.checked"
+        >
+      </div>
+    </article>
     <button
       type="submit"
     >
@@ -61,6 +77,7 @@ export default {
       hasBody: false, // Whether or not form request has a body
       setUsername: false, // Whether or not stored username should be updated after form submission
       refreshFreets: false, // Whether or not stored freets should be updated after form submission
+      booleanFields: [],
       alerts: {}, // Displays success/error messages encountered during form submission
       callback: null // Function to run after successful form submission
     };
@@ -76,8 +93,9 @@ export default {
         credentials: 'same-origin' // Sends express-session credentials with request
       };
       if (this.hasBody) {
+        let allFields = this.fields.concat(this.booleanFields);
         options.body = JSON.stringify(Object.fromEntries(
-          this.fields.map(field => {
+          allFields.map(field => {
             const {id, value} = field;
             field.value = '';
             return [id, value];

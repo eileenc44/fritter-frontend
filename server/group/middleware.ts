@@ -121,7 +121,7 @@ const isNotGroupMember = async (req: Request, res: Response, next: NextFunction)
  * Checks if a Freet is in group
  */
  const isFreetInGroup = async (req: Request, res: Response, next: NextFunction) => {
-  const group = await GroupCollection.findOneFreetInGroup(req.params.groupId, req.body.freetId);
+  const group = await GroupCollection.findOneFreetInGroup(req.params.groupId, req.params.freetId);
   if (!group) {
     res.status(400).json({
       error: {

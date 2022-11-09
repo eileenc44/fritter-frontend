@@ -37,10 +37,12 @@
       <section
         v-if="freets.length"
       >
-        <FreetComponent
+        <GroupFreetComponent
           v-for="freet in freets"
           :key="freet.id"
           :freet="freet"
+          :groupId="$route.params.id"
+          :refreshFreets="getGroupInfo"
         />
       </section>
       <article
@@ -53,13 +55,13 @@
 </template>
 
 <script>
-import FreetComponent from '@/components/Freet/FreetComponent.vue';
+import GroupFreetComponent from '@/components/Group/GroupFreetComponent.vue';
 import CreateGroupFreetForm from '@/components/Group/CreateGroupFreetForm.vue';
 import WordFilterMenu from '@/components/WordFilter/WordFilterMenu.vue';
 
 export default {
   name: 'GroupPage',
-  components: {FreetComponent, CreateGroupFreetForm, WordFilterMenu},
+  components: {GroupFreetComponent, CreateGroupFreetForm, WordFilterMenu},
   data() {
     return {
       group: {},

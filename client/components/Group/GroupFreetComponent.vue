@@ -86,6 +86,11 @@ export default {
       type: Object,
       required: true
     },
+    groupId: {
+      type: String,
+      required: true
+    },
+    refreshFreets: Function
   },
   data() {
     return {
@@ -110,19 +115,28 @@ export default {
       this.editing = false;
       this.draft = this.freet.content;
     },
-    deleteFreet() {
-      /**
-       * Deletes this freet.
-       */
-      const params = {
-        method: 'DELETE',
-        callback: () => {
-          this.$store.commit('alert', {
-            message: 'Successfully deleted freet!', status: 'success'
-          });
+    async deleteFreet() {
+      try {
+        const options = {
+          method: "PATCH", headers: {'Content-Type': 'application/json'}
+        };
+        const r = await fetch(`/api/groups/${this.groupId}/deleteFreet/${this.freet._id}`, options);
+        if (!r.ok) {
+          const res = await r.json();
+          throw new Error(res.error.error);
         }
-      };
-      this.request(params);
+
+        this.editing = false;
+        this.$store.commit('refreshFreets');
+        this.refreshFreets();
+        const message = 'Succesfully deleted Freet';
+        this.$set(this.alerts, message, 'success');
+        setTimeout(() => this.$delete(this.alerts, message), 3000);
+
+      } catch (e) {
+        this.$set(this.alerts, e, 'error');
+        setTimeout(() => this.$delete(this.alerts, e), 3000);
+      }
     },
     submitEdit() {
       /**
@@ -202,3 +216,4 @@ export default {
     filter: blur(5px);
 }
 </style>
+  

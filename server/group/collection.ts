@@ -150,7 +150,7 @@ class GroupCollection {
    * @return {Promise<HydratedDocument<Group>>} - The newly updated group
    */
    static async addFreet(groupId: Types.ObjectId | string, freetId: Types.ObjectId | string): Promise<HydratedDocument<Group>> {
-    await GroupModel.updateOne({_id: groupId}, {$push: {freets: freetId}});
+    await GroupModel.updateOne({_id: groupId}, {$push: {freets: {$each: [freetId], $position: 0}}});
     return await GroupModel.findOne({_id: groupId}).populate('creatorId').populate('members').populate('freets');
   }
 

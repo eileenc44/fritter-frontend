@@ -21,6 +21,9 @@ export default {
       fields: [
         {id: 'content', label: 'Content', value: ''}
       ],
+      booleanFields: [
+        {id: 'anonymous', label: 'Anonymous', value: false}
+      ],
       title: 'Create a group freet',
       refreshFreets: true,
       callback: () => {
