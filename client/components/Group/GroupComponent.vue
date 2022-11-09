@@ -3,16 +3,27 @@
 
 <template>
   <article
-    class="freet"
+    class="group"
   >
     <header>
-      <h3 class="author">
-        <router-link :to="'/users/' + freet.author">
-          @{{ freet.author }}
+      <textarea
+          v-if="editing"
+          class="name"
+          :value="draft"
+          @input="draft = $event.target.value"
+      />
+      <h3 v-else>
+        <router-link :to="'/groups/' + group._id">
+          {{ group.name }}
         </router-link>
       </h3>
+      <p>
+        <router-link :to="'/users/' + group.creator">
+          @{{ group.creator }}
+        </router-link>
+      </p>
       <div
-        v-if="$store.state.username === freet.author"
+        v-if="$store.state.username === group.creator"
         class="actions"
       >
         <button
@@ -33,34 +44,14 @@
         >
           ✏️ Edit
         </button>
-        <button @click="deleteFreet">
+        <button @click="deleteGroup">
           🗑️ Delete
         </button>
       </div>
-      <div v-if="containsFilterWord(freet.content)">
-        <button v-if="isBlur" @click="isBlur=false">
-          Unblur
-        </button>
-        <button v-else="isBlur" @click="isBlur=true">
-          Blur
-        </button>
-      </div>
     </header>
-    <textarea
-      v-if="editing"
-      class="content"
-      :value="draft"
-      @input="draft = $event.target.value"
-    />
-    <p
-      v-else
-      :class="{blur: isBlur}"
-    >
-      {{ freet.content }}
-    </p>
     <p class="info">
-      Posted at {{ freet.dateModified }}
-      <i v-if="freet.edited">(edited)</i>
+      Posted at {{ group.dateModified }}
+      <i v-if="group.edited">(edited)</i>
     </p>
     <section class="alerts">
       <article
@@ -76,57 +67,44 @@
 
 <script>
 export default {
-  name: 'FreetComponent',
+  name: 'GroupComponent',
   props: {
     // Data from the stored freet
-    freet: {
+    group: {
       type: Object,
       required: true
     },
   },
   data() {
     return {
-      editing: false, // Whether or not this freet is in edit mode
-      draft: this.freet.content, // Potentially-new content for this freet
+      editing: false,
+      draft: this.group.name,
       alerts: {}, // Displays success/error messages encountered during freet modification
-      isBlur: this.containsFilterWord(this.freet.content)
     };
   },
   methods: {
     startEditing() {
-      /**
-       * Enables edit mode on this freet.
-       */
-      this.editing = true; // Keeps track of if a freet is being edited
-      this.draft = this.freet.content; // The content of our current "draft" while being edited
+      this.editing = true; 
+      this.draft = this.group.name;
     },
     stopEditing() {
-      /**
-       * Disables edit mode on this freet.
-       */
       this.editing = false;
-      this.draft = this.freet.content;
+      this.draft = this.group.name;
     },
-    deleteFreet() {
-      /**
-       * Deletes this freet.
-       */
+    deleteGroup() {
       const params = {
         method: 'DELETE',
         callback: () => {
           this.$store.commit('alert', {
-            message: 'Successfully deleted freet!', status: 'success'
+            message: 'Successfully deleted group!', status: 'success'
           });
         }
       };
       this.request(params);
     },
     submitEdit() {
-      /**
-       * Updates freet to have the submitted draft content.
-       */
-      if (this.freet.content === this.draft) {
-        const error = 'Error: Edited freet content should be different than current freet content.';
+      if (this.group.name === this.draft) {
+        const error = 'Error: Edited group name should be different than current group content.';
         this.$set(this.alerts, error, 'error'); // Set an alert to be the error text, timeout of 3000 ms
         setTimeout(() => this.$delete(this.alerts, error), 3000);
         return;
@@ -134,8 +112,8 @@ export default {
 
       const params = {
         method: 'PATCH',
-        message: 'Successfully edited freet!',
-        body: JSON.stringify({content: this.draft}),
+        message: 'Successfully edited group!',
+        body: JSON.stringify({name: this.draft}),
         callback: () => {
           this.$set(this.alerts, params.message, 'success');
           setTimeout(() => this.$delete(this.alerts, params.message), 3000);
@@ -145,7 +123,7 @@ export default {
     },
     async request(params) {
       /**
-       * Submits a request to the freet's endpoint
+       * Submits a request to the groups's endpoint
        * @param params - Options for the request
        * @param params.body - Body for the request, if it exists
        * @param params.callback - Function to run if the the request succeeds
@@ -158,42 +136,31 @@ export default {
       }
 
       try {
-        const r = await fetch(`/api/freets/${this.freet._id}`, options);
+        const r = await fetch(`/api/groups/${this.group._id}`, options);
         if (!r.ok) {
           const res = await r.json();
           throw new Error(res.error);
         }
 
         this.editing = false;
-        this.$store.commit('refreshFreets');
+        this.$store.commit('refreshGroups');
 
         params.callback();
       } catch (e) {
         this.$set(this.alerts, e, 'error');
         setTimeout(() => this.$delete(this.alerts, e), 3000);
       }
-    },
-    containsFilterWord(freetContent) {
-      let contains = false;
-      for (let i = 0; i < this.$store.state.wordFilter.length; i++ ) {
-        if (freetContent.includes(this.$store.state.wordFilter[i])) {
-          contains = true;
-        }
-      }
-      return contains;
     }
   }
 };
 </script>
 
 <style scoped>
-.freet {
+.group {
     border: 1px solid #111;
     padding: 20px;
     position: relative;
 }
 
-.blur {
-    filter: blur(5px);
-}
 </style>
+  

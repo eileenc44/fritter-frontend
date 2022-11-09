@@ -75,7 +75,8 @@ export default {
   components: {FreetComponent, GetFreetsForm, CreateFreetForm, WordFilterMenu},
   data() {
     return {
-      filterMenuOn: false
+      filterMenuOn: false,
+      alerts: {}
     }
   },
   methods: {
@@ -105,7 +106,12 @@ export default {
   },
   mounted() {
     this.$refs.getFreetsForm.submit();
-    this.getWordsToFilter();
+    if (this.$store.state.username) {
+      this.getWordsToFilter();
+    }
+    else {
+      this.$store.commit('updateWordFilter', []);
+    }
   }
 };
 </script>

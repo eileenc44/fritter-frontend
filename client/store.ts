@@ -14,6 +14,8 @@ const store = new Vuex.Store({
     followers: [], // All of the user's followers
     followees: [], // All of the user's followees
     wordFilter: [], // All words to filter
+    groupsFilter: null,
+    groups: [],
     username: null, // Username of the logged in user
     alerts: {} // global success/error messages encountered during submissions to non-visible forms
   },
@@ -55,6 +57,17 @@ const store = new Vuex.Store({
       const url = state.filter ? `/api/users/${state.filter}/freets` : '/api/freets';
       const res = await fetch(url).then(async r => r.json());
       state.freets = res;
+    },
+    updateGroupsFilter(state, groupsFilter) {
+      state.groupsFilter = groupsFilter;
+    },
+    updateGroups(state, groups) {
+      state.groups = groups;
+    },
+    async refreshGroups(state) {
+      const url = state.groupsFilter ? `/api/groups/groupName=${state.groupsFilter}` : '/api/groups';
+      const res = await fetch(url).then(async r => r.json());
+      state.groups = res;
     },
     updateFollowers(state, followers) {
       state.followers = followers;

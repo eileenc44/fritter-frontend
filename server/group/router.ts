@@ -39,7 +39,7 @@ router.get(
   '/',
   async (req: Request, res: Response, next: NextFunction) => {
     if (req.query.creator) next();
-    else if (req.query.member) next('route');
+    else if (req.query.member || req.query.groupId) next('route');
     else if (req.query.groupName) {
       const groups = await GroupCollection.findAllByName(req.query.groupName as string);
       const response = groups.map(util.constructGroupResponse);
@@ -68,7 +68,17 @@ router.get(
 /**
  * Get groups by member.
  *
- * @name GET /api/member?member=id
+ * @name GET /api/groups?member=id
+ *
+ * @return {GroupResponse[]} - An array of groups with user as a member
+ * @throws {400} - If memberId is not given
+ * @throws {404} - If no user has given memberId
+ *
+ */
+/**
+ * Get groups by groupId.
+ *
+ * @name GET /api/group?groupId=id
  *
  * @return {GroupResponse[]} - An array of groups with user as a member
  * @throws {400} - If memberId is not given
@@ -81,9 +91,16 @@ router.get(
     userValidator.isValidUsername
   ],
   async (req: Request, res: Response) => {
-    const creatorGroups = await GroupCollection.findAllByMember(req.query.member as string);
-    const response = creatorGroups.map(util.constructGroupResponse);
-    res.status(200).json(response);
+    if (req.query.groupId){
+      const group = await GroupCollection.findOne(req.query.groupId as string);
+      const response = util.constructGroupResponse(group);
+      res.status(200).json(response);
+    }
+    else {
+      const creatorGroups = await GroupCollection.findAllByMember(req.query.member as string);
+      const response = creatorGroups.map(util.constructGroupResponse);
+      res.status(200).json(response);
+    }
   }
 );
 
@@ -143,7 +160,7 @@ router.delete(
 /**
  * Modify group name
  *
- * @name PUT /api/groups/:id
+ * @name PATCH /api/groups/:id
  *
  * @param {string} name - the new name for the group
  * @return {GroupResponse} - the updated group
@@ -153,7 +170,7 @@ router.delete(
  * @throws {400} - If the group name is empty or a stream of empty spaces
  * @throws {413} - If the group name is more than 50 characters long
  */
- router.put(
+ router.patch(
   '/:groupId?',
   [
     userValidator.isUserLoggedIn,
@@ -173,14 +190,14 @@ router.delete(
 /**
  * Add a member to a group
  *
- * @name PUT /api/groups/:id
+ * @name PATCH /api/groups/:id
  *
  * @return {GroupResponse} - the updated group
  * @throws {403} - if the user is not logged in
  * @throws {404} - if the groupId is not valid
  * @throws {400} - if the user is already a member of the group
  */
-router.put(
+router.patch(
   '/:groupId?/join',
   [
     userValidator.isUserLoggedIn,
@@ -199,13 +216,13 @@ router.put(
 /**
  * Remove a member from a group
  *
- * @name PUT /api/groups/:id
+ * @name PATCH /api/groups/:id
  *
  * @return {GroupResponse} - the updated group
  * @throws {403} - if the user is not logged in
  * @throws {404} - If the groupId is not valid
  */
-router.put(
+router.patch(
   '/:groupId?/leave',
   [
     userValidator.isUserLoggedIn,
@@ -224,7 +241,7 @@ router.put(
 /**
  * Add a freet to a group
  *
- * @name PUT /api/groups/:id/addFreet
+ * @name PATCH /api/groups/:id/addFreet
  *
  * @param {string} content - the content of the freet to add
  * @param {boolean} anonymous - if freet is boolean
@@ -233,7 +250,7 @@ router.put(
  * @throws {404} - if the groupId is not valid
  * @throws {403} - If the user is not the author of the freet or is not a member of the group
  */
- router.put(
+ router.patch(
   '/:groupId?/addFreet',
   [
     userValidator.isUserLoggedIn,

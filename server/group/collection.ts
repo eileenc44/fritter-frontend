@@ -31,7 +31,14 @@ class GroupCollection {
    * @return {Promise<HydratedDocument<Group>> | Promise<null> } - The group with the given groupId, if any
    */
   static async findOne(groupId: Types.ObjectId | string): Promise<HydratedDocument<Group>> {
-    return GroupModel.findOne({_id: groupId}).populate('creatorId').populate('members').populate('freets');
+    return await GroupModel.findOne({_id: groupId}).populate('creatorId').populate('members')
+    .populate({
+      path: 'freets',
+      populate: {
+        path:'authorId',
+        model: 'User'
+      }
+    });
   }
 
   /**

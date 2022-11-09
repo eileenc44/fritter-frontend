@@ -4,6 +4,8 @@ import FreetsPage from './components/Freet/FreetsPage.vue';
 import AccountPage from './components/Account/AccountPage.vue';
 import LoginPage from './components/Login/LoginPage.vue';
 import ProfilePage from './components/Follow/ProfilePage.vue';
+import GroupsPage from './components/Group/GroupsPage.vue';
+import GroupPage from './components/Group/GroupPage.vue';
 import NotFound from './NotFound.vue';
 
 Vue.use(VueRouter);
@@ -13,6 +15,8 @@ const routes = [
   {path: '/account', name: 'Account', component: AccountPage},
   {path: '/login', name: 'Login', component: LoginPage},
   {path: '/users/:id', name: 'Profile', component: ProfilePage},
+  {path: '/groups/:id', name: 'Group', component: GroupPage},
+  {path: '/groups', name: 'Groups', component: GroupsPage},
   {path: '*', name: 'Not Found', component: NotFound}
 ];
 
@@ -34,6 +38,16 @@ router.beforeEach((to, from, next) => {
     }
 
     if (to.name === 'Profile' && !router.app.$store.state.username) {
+      next({name: 'Login'}); // Go to Login page if user navigates to Profile and are not signed in
+      return;
+    }
+
+    if (to.name === 'Groups' && !router.app.$store.state.username) {
+      next({name: 'Login'}); // Go to Login page if user navigates to Profile and are not signed in
+      return;
+    }
+
+    if (to.name === 'Group' && !router.app.$store.state.username) {
       next({name: 'Login'}); // Go to Login page if user navigates to Profile and are not signed in
       return;
     }
